@@ -1,0 +1,17 @@
+# ---------------------------------------------------------------
+# Archivos que NUNCA se suben a GitHub
+# ---------------------------------------------------------------
+
+# Respaldos descargados desde la aplicación (pueden contener datos)
+respaldo-noc-*.json
+
+# Secretos (si en el futuro se agrega un backend)
+.env
+*.key
+*.pem
+
+# Archivos del sistema operativo y del editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/

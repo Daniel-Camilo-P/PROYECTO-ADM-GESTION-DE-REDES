@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="NOC Syslog Inteligente - Proyecto académico de Administración y Gestión de Redes">
+  <title>NOC Syslog Inteligente</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+<!-- =============================================================
+     NOC Syslog Inteligente v0.2.0 - Página principal
+     HTML (estructura) + CSS (diseño) + JavaScript (lógica).
+     No necesita instalar nada: se abre con doble clic o desde GitHub Pages.
+     ============================================================= -->
+<header class="barra">
+  <div class="marca">
+    <span class="logo" aria-hidden="true">◉</span>
+    <div>
+      <h1>NOC Syslog Inteligente</h1>
+      <small>v0.2.0 · Administración y Gestión de Redes · <b class="sim">DATOS SIMULADOS</b></small>
+    </div>
+  </div>
+  <div class="sesion">
+    <label>Usuario <input id="usuario" value="daniel.pena" maxlength="40"></label>
+    <label>Rol
+      <select id="rol">
+        <option value="lector">lector</option>
+        <option value="operador">operador</option>
+        <option value="administrador" selected>administrador</option>
+      </select>
+    </label>
+  </div>
+</header>
+
+<nav class="pestanas" id="pestanas">
+  <button data-tab="dashboard" class="activa">Dashboard</button>
+  <button data-tab="inventario">Inventario</button>
+  <button data-tab="eventos">Eventos Syslog</button>
+  <button data-tab="incidentes">Incidentes</button>
+  <button data-tab="configuraciones">Configuraciones</button>
+  <button data-tab="consola">Consola</button>
+  <button data-tab="seguridad">Seguridad y auditoría</button>
+</nav>
+
+<main>
+  <div id="aviso" class="aviso oculto" role="status"></div>
+  <div id="pendiente" class="panel pendiente oculto"></div>
+
+  <!-- ===================== DASHBOARD (Fase 4) ===================== -->
+  <section id="tab-dashboard" class="tab" data-fase="4">
+    <div class="tarjetas" id="kpis"></div>
+    <div class="fila">
+      <div class="panel">
+        <h2>Simular evento <span class="etiqueta">SIMULADO</span></h2>
+        <form id="form-simular" class="en-linea">
+          <select id="sim-equipo" required></select>
+          <select id="sim-sev"></select>
+          <button type="submit">Generar evento</button>
+        </form>
+        <h2>Eventos por severidad (24 h)</h2>
+        <div id="barras-sev" class="barras"></div>
+      </div>
+      <div class="panel">
+        <h2>Estado de los equipos</h2>
+        <table><thead><tr><th>Equipo</th><th>Marca</th><th>Estado</th><th>Comunicación</th><th>Último evento</th></tr></thead>
+          <tbody id="dash-equipos"></tbody></table>
+      </div>
+    </div>
+    <div class="fila">
+      <div class="panel">
+        <h2>Eventos críticos y alertas (severidad 0-3)</h2>
+        <table><thead><tr><th>Sev</th><th>Equipo</th><th>Mensaje</th><th>Recibido</th></tr></thead>
+          <tbody id="dash-criticos"></tbody></table>
+      </div>
+      <div class="panel">
+        <h2>Incidentes abiertos</h2>
+        <table><thead><tr><th>#</th><th>Sev</th><th>Título</th><th>Estado</th><th>Responsable</th></tr></thead>
+          <tbody id="dash-incidentes"></tbody></table>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Eventos recientes</h2>
+      <table><thead><tr><th>Sev</th><th>Equipo</th><th>Marca</th><th>Facility</th><th>Mensaje</th><th>Canal</th><th>Recibido</th></tr></thead>
+        <tbody id="dash-recientes"></tbody></table>
+    </div>
+  </section>
+
+  <!-- ===================== INVENTARIO (Fase 2) ===================== -->
+  <section id="tab-inventario" class="tab oculto" data-fase="2">
+    <div class="panel">
+      <h2 id="titulo-form-equipo">Agregar equipo</h2>
+      <form id="form-equipo" class="rejilla">
+        <input type="hidden" id="eq-id">
+        <label>Nombre (hostname)<input id="eq-nombre" required placeholder="R2-SEDE"></label>
+        <label>IP<input id="eq-ip" required placeholder="192.0.2.40"></label>
+        <label>Marca<select id="eq-marca"><option>Cisco</option><option>Fortinet</option><option>Huawei</option><option>Otro</option></select></label>
+        <label>Modelo<input id="eq-modelo" placeholder="ISR 4321"></label>
+        <label>Versión / SO<input id="eq-version" placeholder="IOS XE 17.9"></label>
+        <label>Ubicación<input id="eq-ubicacion" placeholder="Sede norte - Rack 1"></label>
+        <label>Estado<select id="eq-estado"><option value="operativo">operativo</option><option value="mantenimiento">mantenimiento</option><option value="fuera_de_servicio">fuera de servicio</option></select></label>
+        <label>Origen del dato<select id="eq-origen"><option>SIMULADO</option><option>REAL</option></select></label>
+        <div class="acciones">
+          <button type="submit">Guardar</button>
+          <button type="button" id="eq-cancelar" class="secundario">Cancelar edición</button>
+        </div>
+      </form>
+    </div>
+    <div class="panel">
+      <h2>Inventario de equipos</h2>
+      <table><thead><tr><th>Nombre</th><th>IP</th><th>Marca</th><th>Modelo</th><th>Versión</th><th>Ubicación</th><th>Estado</th><th>Comunicación</th><th>Dato</th><th>Actualizado</th><th></th></tr></thead>
+        <tbody id="tabla-equipos"></tbody></table>
+    </div>
+  </section>
+
+  <!-- ===================== EVENTOS (Fase 3) ===================== -->
+  <section id="tab-eventos" class="tab oculto" data-fase="3">
+    <div class="fila">
+      <div class="panel">
+        <h2>Receptor Syslog en vivo <span class="etiqueta">SIMULADO</span> <span id="estado-receptor" class="estado medio">detenido</span></h2>
+        <p class="nota">Simula equipos que envían mensajes por la red. Cada mensaje llega con la IP de origen del equipo y pasa por la misma política que un mensaje real.</p>
+        <div class="en-linea">
+          <button type="button" id="rx-iniciar">Iniciar recepción</button>
+          <button type="button" id="rx-detener" class="secundario">Detener</button>
+        </div>
+        <div class="en-linea">
+          <button type="button" class="peligro pequeno" id="rx-inyeccion">Enviar log con instrucciones (inyección)</button>
+          <button type="button" class="peligro pequeno" id="rx-desconocido">Equipo desconocido</button>
+          <button type="button" class="peligro pequeno" id="rx-suplantacion">Suplantación de R1-NOC</button>
+          <button type="button" class="peligro pequeno" id="rx-tormenta">Tormenta (300 mensajes)</button>
+        </div>
+        <h2>Importar archivo Syslog</h2>
+        <form id="form-importar" class="en-linea">
+          <input type="file" id="archivo-log" accept=".log,.txt">
+          <button type="submit">Importar archivo</button>
+          <button type="button" id="btn-ejemplo" class="secundario">Importar ejemplo (SIMULADO)</button>
+        </form>
+        <pre id="resultado-importar" class="salida pequena"></pre>
+      </div>
+      <div class="panel">
+        <h2>Severidades Syslog (RFC 5424)</h2>
+        <table class="compacta"><thead><tr><th>Nivel</th><th>Nombre</th><th>Significado</th></tr></thead>
+          <tbody id="tabla-severidades"></tbody></table>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Filtros</h2>
+      <form id="form-filtros" class="rejilla">
+        <label>Desde<input type="date" id="f-desde"></label>
+        <label>Hasta<input type="date" id="f-hasta"></label>
+        <label>Marca<select id="f-marca"><option value="">Todas</option><option>Cisco</option><option>Fortinet</option><option>Huawei</option><option>Otro</option></select></label>
+        <label>Equipo<select id="f-equipo"><option value="">Todos</option></select></label>
+        <label>Severidad mínima<select id="f-sevmin"></select></label>
+        <label>Severidad máxima<select id="f-sevmax"></select></label>
+        <label>Texto<input id="f-texto" placeholder="down, login..."></label>
+        <label class="check"><input type="checkbox" id="f-sospechosos"> Solo sospechosos / no autorizados</label>
+        <div class="acciones">
+          <button type="submit">Aplicar filtros</button>
+          <button type="button" id="f-limpiar" class="secundario">Limpiar</button>
+        </div>
+      </form>
+    </div>
+    <div class="panel">
+      <h2>Eventos <span id="total-eventos" class="etiqueta"></span></h2>
+      <table><thead><tr><th>#</th><th>Sev</th><th>Fecha evento</th><th>Equipo / host</th><th>Marca</th><th>Facility</th><th>Mensaje</th><th>Rep.</th><th>Canal</th><th>Alerta</th><th></th></tr></thead>
+        <tbody id="tabla-eventos"></tbody></table>
+    </div>
+  </section>
+
+  <!-- ===================== INCIDENTES (Fase 4) ===================== -->
+  <section id="tab-incidentes" class="tab oculto" data-fase="4">
+    <div class="fila">
+      <div class="panel">
+        <h2>Crear incidente manual</h2>
+        <form id="form-incidente" class="rejilla">
+          <label class="ancho">Título<input id="in-titulo" required maxlength="200"></label>
+          <label>Severidad<select id="in-sev"></select></label>
+          <label>Equipo<select id="in-equipo"><option value="">(ninguno)</option></select></label>
+          <label>Responsable<input id="in-resp" maxlength="60"></label>
+          <label class="ancho">Descripción<textarea id="in-desc" rows="2"></textarea></label>
+          <div class="acciones"><button type="submit">Crear incidente</button></div>
+        </form>
+      </div>
+      <div class="panel">
+        <h2>Detalle del incidente</h2>
+        <div id="detalle-incidente" class="vacio">Seleccione un incidente de la lista.</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Incidentes
+        <select id="filtro-estado" class="pequeno">
+          <option value="activos">Activos</option><option value="">Todos</option>
+          <option value="abierto">abierto</option><option value="asignado">asignado</option>
+          <option value="en_progreso">en progreso</option><option value="resuelto">resuelto</option><option value="cerrado">cerrado</option>
+        </select></h2>
+      <table><thead><tr><th>#</th><th>Sev</th><th>Título</th><th>Equipo</th><th>Estado</th><th>Responsable</th><th>SLA</th><th>Creado</th><th>Creado por</th></tr></thead>
+        <tbody id="tabla-incidentes"></tbody></table>
+    </div>
+  </section>
+
+  <!-- ===================== CONFIGURACIONES (Fase 5) ===================== -->
+  <section id="tab-configuraciones" class="tab oculto" data-fase="5">
+    <div class="fila">
+      <div class="panel">
+        <h2>Generador de configuración Syslog</h2>
+        <form id="form-config" class="rejilla">
+          <label>Fabricante<select id="cf-marca"><option>Cisco</option><option>Fortinet</option><option>Huawei</option></select></label>
+          <label>IP del colector<input id="cf-ip" value="192.0.2.250" required></label>
+          <label>Puerto<input id="cf-puerto" type="number" value="514" min="1" max="65535"></label>
+          <label>Umbral de severidad<select id="cf-umbral"></select></label>
+          <label>Interfaz de origen<input id="cf-interfaz" placeholder="Loopback0"></label>
+          <label>Servidor NTP (opcional)<input id="cf-ntp" placeholder="192.0.2.123"></label>
+          <div class="acciones"><button type="submit">Generar y explicar</button></div>
+        </form>
+        <p class="nota">La plantilla NO se aplica a ningún equipo. Revísela con la documentación oficial,
+          haga backup, pruebe en laboratorio y obtenga autorización.</p>
+        <p class="nota" id="cf-validacion"></p>
+      </div>
+      <div class="panel">
+        <h2>Plantilla <button type="button" id="cf-copiar" class="secundario pequeno">Copiar</button></h2>
+        <pre id="cf-salida" class="salida"></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CONSOLA (Fase 5) ===================== -->
+  <section id="tab-consola" class="tab oculto" data-fase="5">
+    <div class="panel">
+      <h2>Consola tipo PuTTY <span class="etiqueta">SIMULACIÓN · SOLO LECTURA</span></h2>
+      <div class="en-linea">
+        <label>Perfil <select id="co-perfil"></select></label>
+        <label>Equipo <select id="co-equipo"></select></label>
+      </div>
+      <div class="terminal" id="terminal">
+        <div class="t-linea t-info">Consola educativa. No existe conexión a equipos reales. Escriba "help".</div>
+      </div>
+      <form id="form-comando" class="t-entrada">
+        <span id="co-prompt">R1-NOC#</span>
+        <input id="co-comando" autocomplete="off" spellcheck="false" maxlength="200" placeholder="show version">
+      </form>
+      <div id="co-propuesta" class="propuesta oculto">
+        <p>Este es un comando de <b>cambio</b>. No se ejecuta. Puede dejarlo como <b>propuesta</b>
+          para que un administrador distinto la revise y apruebe.</p>
+        <form id="form-propuesta" class="en-linea">
+          <input id="pr-comando" readonly>
+          <input id="pr-just" placeholder="Justificación del cambio" required maxlength="300">
+          <button type="submit">Registrar propuesta</button>
+        </form>
+      </div>
+      <p class="nota" id="co-permitidos"></p>
+    </div>
+  </section>
+
+  <!-- ===================== SEGURIDAD (Fase 6) ===================== -->
+  <section id="tab-seguridad" class="tab oculto" data-fase="6">
+    <div class="panel politica">
+      <h2>Política de defensa frente a agentes de IA (resumen)</h2>
+      <ol class="flujo">
+        <li>Evento detectado</li><li>Validación</li><li>Propuesta</li><li>Revisión humana</li>
+        <li>Aprobación</li><li>Ejecución autorizada</li><li>Verificación</li><li>Auditoría</li>
+      </ol>
+      <ul>
+        <li><b>Los logs son datos no confiables:</b> nunca se usan como instrucciones. Si un log "pide" algo, se marca como sospechoso.</li>
+        <li><b>Fuentes autorizadas:</b> solo los equipos del inventario (por su IP) generan incidentes.</li>
+        <li><b>Lista permitida de comandos</b> y denegación por defecto en la consola.</li>
+        <li><b>Aprobación humana</b> con separación de funciones: quien propone no aprueba.</li>
+        <li><b>Control de tormentas:</b> deduplicación y límite de mensajes por minuto.</li>
+        <li><b>Sin secretos:</b> la aplicación no guarda contraseñas ni tokens; las que aparecen en logs se enmascaran.</li>
+        <li><b>Auditoría encadenada</b> con hash SHA-256 para detectar alteraciones.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h2>Propuestas de cambio (aprobación humana)</h2>
+      <table><thead><tr><th>#</th><th>Fecha</th><th>Propuso</th><th>Equipo</th><th>Comando</th><th>Justificación</th><th>Estado</th><th>Aprobó</th><th>Acciones</th></tr></thead>
+        <tbody id="tabla-propuestas"></tbody></table>
+    </div>
+    <div class="fila">
+      <div class="panel">
+        <h2>Detecciones de seguridad</h2>
+        <table><thead><tr><th>Fecha</th><th>Tipo</th><th>Detalle</th></tr></thead>
+          <tbody id="tabla-seguridad"></tbody></table>
+      </div>
+      <div class="panel">
+        <h2>Comandos de consola registrados</h2>
+        <table><thead><tr><th>Fecha</th><th>Usuario</th><th>Perfil</th><th>Comando</th><th>Decisión</th></tr></thead>
+          <tbody id="tabla-comandos"></tbody></table>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Auditoría (quién, qué, cuándo) <button type="button" id="btn-integridad" class="secundario pequeno">Verificar integridad</button>
+        <span id="integridad" class="etiqueta"></span></h2>
+      <table><thead><tr><th>#</th><th>Fecha</th><th>Actor</th><th>Acción</th><th>Entidad</th><th>Detalle</th><th>Hash</th></tr></thead>
+        <tbody id="tabla-auditoria"></tbody></table>
+    </div>
+    <div class="panel">
+      <h2>Respaldo y recuperación</h2>
+      <p class="nota">Los datos se guardan en este navegador. Descargue un respaldo antes de borrar el historial del navegador o cambiar de computador.</p>
+      <div class="en-linea">
+        <button type="button" id="btn-respaldo">Descargar respaldo (.json)</button>
+        <label class="boton-archivo">Restaurar respaldo <input type="file" id="archivo-respaldo" accept=".json"></label>
+        <button type="button" id="btn-reiniciar" class="peligro">Reiniciar datos de prueba</button>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>NOC Syslog Inteligente v0.2.0 · Proyecto académico individual · Daniel Camilo Peña Pulido · 2026-2 ·
+  Los datos mostrados son SIMULADOS salvo que se indique "REAL".</footer>
+
+<!-- Núcleo (lógica). Cada archivo indica la fase en que se agrega. -->
+<script src="js/nucleo/config.js"></script>          <!-- Fase 1 -->
+<script src="js/nucleo/datos.js"></script>           <!-- Fase 1 -->
+<script src="js/nucleo/api.js"></script>             <!-- Fase 1 -->
+<script src="js/nucleo/seguridad.js"></script>       <!-- Fase 2 -->
+<script src="js/nucleo/inventario.js"></script>      <!-- Fase 2 -->
+<script src="js/nucleo/syslog.js"></script>          <!-- Fase 3 -->
+<script src="js/nucleo/ingreso.js"></script>         <!-- Fase 3 -->
+<script src="js/nucleo/eventos.js"></script>         <!-- Fase 3 -->
+<script src="data/ejemplo.js"></script>              <!-- Fase 3 -->
+<script src="js/nucleo/incidentes.js"></script>      <!-- Fase 4 -->
+<script src="js/nucleo/configuraciones.js"></script> <!-- Fase 5 -->
+<script src="js/nucleo/consola.js"></script>         <!-- Fase 5 -->
+<script src="js/nucleo/acciones.js"></script>        <!-- Fase 6 -->
+<!-- Interfaz (vistas) -->
+<script src="js/ui.js"></script>                     <!-- Fase 1 -->
+<script src="js/vistas/inventario.js"></script>      <!-- Fase 2 -->
+<script src="js/vistas/eventos.js"></script>         <!-- Fase 3 -->
+<script src="js/vistas/dashboard.js"></script>       <!-- Fase 4 -->
+<script src="js/vistas/incidentes.js"></script>      <!-- Fase 4 -->
+<script src="js/vistas/configuraciones.js"></script> <!-- Fase 5 -->
+<script src="js/vistas/consola.js"></script>         <!-- Fase 5 -->
+<script src="js/vistas/seguridad.js"></script>       <!-- Fase 6 -->
+</body>
+</html>
