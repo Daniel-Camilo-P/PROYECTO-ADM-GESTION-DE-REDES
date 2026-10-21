@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pruebas · NOC Syslog</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+<!-- =============================================================
+     pruebas.html - Pruebas automáticas del NOC Syslog Inteligente
+     Ábrala con doble clic. Usa una base de datos temporal en memoria:
+     NO modifica los datos guardados de la aplicación.
+     ============================================================= -->
+<header class="barra">
+  <div class="marca">
+    <span class="logo" aria-hidden="true">✓</span>
+    <div>
+      <h1>Pruebas automáticas</h1>
+      <small>NOC Syslog Inteligente v0.2.0 · Daniel Camilo Peña Pulido · <a href="index.html">Volver a la aplicación</a></small>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="tarjetas" id="resumen"></div>
+  <div class="panel">
+    <h2>Resultado por prueba <span id="fecha" class="etiqueta"></span></h2>
+    <table><thead><tr><th>Fase</th><th>Grupo</th><th>Prueba</th><th>Resultado</th><th>Detalle</th></tr></thead>
+      <tbody id="resultados"></tbody></table>
+  </div>
+</main>
+
+<script src="js/nucleo/config.js"></script>
+<script src="js/nucleo/datos.js"></script>
+<script src="js/nucleo/api.js"></script>
+<script src="js/nucleo/seguridad.js"></script>
+<script src="js/nucleo/inventario.js"></script>
+<script src="js/nucleo/syslog.js"></script>
+<script src="js/nucleo/ingreso.js"></script>
+<script src="js/nucleo/eventos.js"></script>
+<script src="data/ejemplo.js"></script>
+<script src="js/nucleo/incidentes.js"></script>
+<script src="js/nucleo/configuraciones.js"></script>
+<script src="js/nucleo/consola.js"></script>
+<script src="js/nucleo/acciones.js"></script>
+<script src="tests/motor.js"></script>
+<script src="tests/prueba_inventario.js"></script>
+<script src="tests/prueba_syslog.js"></script>
+<script src="tests/prueba_incidentes.js"></script>
+<script src="tests/prueba_config_consola.js"></script>
+<script src="tests/prueba_seguridad.js"></script>
+<script src="tests/ejecutar.js"></script>
+</body>
+</html>
