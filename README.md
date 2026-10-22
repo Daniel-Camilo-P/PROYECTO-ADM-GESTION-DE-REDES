@@ -10,7 +10,7 @@ Hecha **solo con HTML, CSS y JavaScript**: no requiere instalar nada.
 | **Autor** | Daniel Camilo Peña Pulido |
 | **Asignatura** | Administración y Gestión de Redes · Periodo 2026-2 |
 | **Docente** | Ing. John Harold Pérez Calderón |
-| **Ver en línea** | https://TU-USUARIO.github.io/noc-syslog-inteligente/ |
+| **Ver en línea** | https://daniel-camilo-p.github.io/PROYECTO-ADM-GESTION-DE-REDES/ |
 | **Datos** | ⚠️ Todos los equipos y eventos son **SIMULADOS** (IPs de documentación RFC 5737) |
 | **Uso** | Académico |
 
